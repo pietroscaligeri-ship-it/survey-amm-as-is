@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Survey Gap Amministrativi — Magic Engineering</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f8f7f4;--surface:#fff;--surface2:#f1f0ed;--border:#e2e0db;--border2:#cccac4;--text:#1a1917;--text2:#6b6860;--text3:#a09d97;--accent:#2563eb;--accent-bg:#eff6ff;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--radius:10px;--radius-sm:6px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;min-height:100vh}
+.shell{max-width:680px;margin:0 auto;padding:2rem 1.25rem 4rem}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:2rem}
+.logo-mark{width:32px;height:32px;background:var(--text);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:18px;height:18px;fill:none;stroke:white;stroke-width:2}
+.logo-name{font-size:14px;font-weight:600}
+.logo-sub{font-size:13px;color:var(--text2)}
+.screen{display:none}.screen.active{display:block}
+.intro-title{font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:10px}
+.intro-sub{font-size:15px;color:var(--text2);margin-bottom:2rem;line-height:1.6;max-width:520px}
+.name-field{margin-bottom:2rem}
+.name-field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.name-field input{width:100%;padding:10px 14px;font-size:15px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);outline:none}
+.name-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.cluster-section-title{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text2)}
+.cluster-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:2rem}
+.cluster-card{border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer;background:var(--surface);transition:border-color .12s;user-select:none}
+.cluster-card.on{border-color:var(--accent);background:var(--accent-bg)}
+.cc-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle}
+.cc-name{font-size:14px;font-weight:600}
+.cc-desc{font-size:12px;color:var(--text2);margin-top:4px}
+.cc-count{font-size:11px;color:var(--text3);margin-top:6px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;border:1.5px solid var(--border2);background:var(--surface);color:var(--text);transition:background .1s}
+.btn:hover{background:var(--surface2)}
+.btn-primary{background:var(--text);color:white;border-color:var(--text)}
+.btn-primary:hover{background:#333}
+.btn-sm{padding:7px 14px;font-size:13px}
+.progress-wrap{margin-bottom:1.5rem}
+.progress-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px}
+.progress-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:4px;background:var(--accent);border-radius:2px;transition:width .3s}
+.q-cluster-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:12px}
+.q-id-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.q-id-badge{font-size:11px;font-weight:700;padding:3px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text2);white-space:nowrap;flex-shrink:0;margin-top:3px}
+.q-title{font-size:20px;font-weight:700;letter-spacing:-.01em;line-height:1.3}
+.context-card{background:var(--surface2);border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:1.5rem;border-left:3px solid var(--border2)}
+.context-card strong{color:var(--text);font-weight:600}
+.q-section-label{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.priority-row{display:flex;gap:8px;margin-bottom:1.5rem}
+.p-btn{flex:1;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);padding:10px 4px 8px;text-align:center;cursor:pointer;transition:all .1s}
+.p-btn:hover{border-color:var(--border2);background:var(--surface2)}
+.p-btn .p-num{font-size:22px;font-weight:700;display:block;line-height:1}
+.p-btn .p-lbl{font-size:10px;color:var(--text2);margin-top:4px;display:block;line-height:1.2}
+.p-btn.sel-1{border-color:#059669;background:#ecfdf5}.p-btn.sel-1 .p-lbl{color:#065f46}
+.p-btn.sel-2{border-color:#34d399;background:#ecfdf5}.p-btn.sel-2 .p-lbl{color:#065f46}
+.p-btn.sel-3{border-color:#d97706;background:#fffbeb}.p-btn.sel-3 .p-lbl{color:#92400e}
+.p-btn.sel-4{border-color:#f97316;background:#fff7ed}.p-btn.sel-4 .p-lbl{color:#7c2d12}
+.p-btn.sel-5{border-color:#dc2626;background:#fef2f2}.p-btn.sel-5 .p-lbl{color:#7f1d1d}
+.time-row{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
+.time-input-wrap{display:flex;align-items:center;gap:6px}
+.time-input-wrap input[type=number]{width:72px;padding:9px 10px;text-align:center;font-size:16px;font-weight:600;border:1.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);outline:none}
+.time-input-wrap input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.time-sep{font-size:20px;font-weight:700;color:var(--text2)}
+.time-hint{font-size:12px;color:var(--text3)}
+textarea{width:100%;min-height:70px;resize:vertical;padding:10px 14px;font-size:13px;line-height:1.5;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);outline:none;font-family:inherit}
+textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.skip-link{display:inline-block;margin-top:10px;font-size:13px;color:var(--text3);cursor:pointer;text-decoration:underline;text-underline-offset:2px;background:none;border:none}
+.skip-link:hover{color:var(--text2)}
+.nav-bar{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--border)}
+.nav-counter{font-size:13px;color:var(--text2)}
+.break-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:2rem;text-align:center;margin-bottom:1rem}
+.break-icon{font-size:36px;margin-bottom:12px}
+.break-card h2{font-size:20px;font-weight:700;margin-bottom:6px}
+.break-card p{font-size:14px;color:var(--text2);margin-bottom:1.5rem}
+.submit-box{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem}
+.submit-box h2{font-size:20px;font-weight:700;margin-bottom:8px}
+.submit-box p{font-size:14px;color:var(--text2);margin-bottom:1.25rem}
+.summary-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.25rem}
+.summary-pill{font-size:12px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2)}
+.divider{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
+.done-card{background:var(--surface);border:1.5px solid #6ee7b7;border-radius:var(--radius);padding:2.5rem 2rem;text-align:center}
+.done-check{width:56px;height:56px;background:var(--green-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+.done-check svg{width:28px;height:28px;stroke:var(--green);stroke-width:2.5;fill:none}
+.done-card h2{font-size:22px;font-weight:700;margin-bottom:8px}
+.done-card p{font-size:14px;color:var(--text2)}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1a1917;color:white;font-size:13px;padding:10px 18px;border-radius:8px;display:none;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.err{background:var(--red)}.toast.show{display:block}
+@media(max-width:500px){.cluster-grid{grid-template-columns:1fr}.priority-row{gap:5px}.p-btn .p-num{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="logo-row">
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <div><div class="logo-name">Magic Engineering</div><div class="logo-sub">Survey interna — Gap amministrativi</div></div>
+  </div>
+
+  <div class="screen active" id="screen-intro">
+    <h1 class="intro-title">Valutiamo insieme le inefficienze</h1>
+    <p class="intro-sub">Per ogni gap indica quanto ti impatta e quanto tempo ci perdi a settimana. Non ci sono risposte giuste o sbagliate.</p>
+    <div class="name-field">
+      <label for="inp-name">Il tuo nome</label>
+      <input type="text" id="inp-name" placeholder="Es. Caterina, Alessia…" autocomplete="given-name"/>
+    </div>
+    <div class="cluster-section-title">Seleziona i cluster che riguardano il tuo ruolo:</div>
+    <div class="cluster-grid" id="cluster-grid"></div>
+    <button class="btn btn-primary" onclick="startSurvey()">Inizia la survey →</button>
+  </div>
+
+  <div class="screen" id="screen-break">
+    <div class="break-card">
+      <div class="break-icon" id="break-icon">📦</div>
+      <h2 id="break-title">Nuovo cluster</h2>
+      <p id="break-desc">Stai per iniziare un nuovo gruppo di domande.</p>
+      <button class="btn btn-primary" onclick="continueFromBreak()">Continua →</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-question">
+    <div class="progress-wrap">
+      <div class="progress-meta"><span id="prog-label">Domanda 1 di 54</span><span id="prog-pct">0%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="q-cluster-pill" id="q-pill"></div>
+    <div class="q-id-row">
+      <span class="q-id-badge" id="q-id"></span>
+      <span class="q-title" id="q-title"></span>
+    </div>
+    <div class="context-card" id="q-context"></div>
+    <div class="q-section-label">Priorità di risoluzione</div>
+    <div class="priority-row" id="priority-row"></div>
+    <div class="q-section-label">Tempo medio di gestione / settimana</div>
+    <div class="time-row">
+      <div class="time-input-wrap">
+        <input type="number" id="t-h" min="0" max="40" placeholder="0"/>
+        <span class="time-sep">h</span>
+        <input type="number" id="t-m" min="0" max="59" placeholder="00"/>
+        <span class="time-sep" style="font-size:14px;font-weight:400">min</span>
+      </div>
+      <span class="time-hint">lascia vuoto se trascurabile</span>
+    </div>
+    <div class="q-section-label">Note aggiuntive <span style="font-weight:400;color:var(--text3)">(opzionale)</span></div>
+    <textarea id="q-notes" placeholder="Dettagli, suggerimenti, casi specifici…"></textarea>
+    <div><button class="skip-link" onclick="skipQ()">↷ Non mi occupo di questo flusso — salta</button></div>
+    <div class="nav-bar">
+      <button class="btn btn-sm" onclick="prevQ()" id="btn-prev">← Indietro</button>
+      <span class="nav-counter" id="nav-counter"></span>
+      <button class="btn btn-primary btn-sm" onclick="nextQ()">Avanti →</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-submit">
+    <div class="submit-box">
+      <h2>Tutto pronto per l'invio</h2>
+      <p>Rivedi il riepilogo e invia le tue risposte. I dati verranno salvati su Google Sheets condiviso.</p>
+      <div class="summary-pills" id="summary-pills"></div>
+      <hr class="divider">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="submitAnswers()" id="btn-submit">Invia risposte →</button>
+        <button class="btn btn-sm" onclick="goBackToLast()">← Torna indietro</button>
+      </div>
+    </div>
+    <div id="submit-status" style="font-size:13px;color:var(--text2);"></div>
+  </div>
+
+  <div class="screen" id="screen-done">
+    <div class="done-card">
+      <div class="done-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+      <h2>Risposte inviate!</h2>
+      <p id="done-msg">Grazie. Le tue risposte sono state salvate nel foglio condiviso.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const WEBHOOK_URL = "https://magicengineering.app.n8n.cloud/webhook/d511fd35-d452-4fc8-9ff8-04f2df64d79a";
+const P_LABELS = ["","Bassa","Minore","Media","Alta","Critica"];
+
+const CLUSTERS = [
+  {
+    id:"C1",name:"Ciclo passivo & acquisti",icon:"🛒",color:"#2563eb",bg:"#eff6ff",
+    desc:"RDA, ordini fornitori, Revolut, magazzino",
+    gaps:[
+      {id:"G1",title:"Validazione RDA assente",ctx:"<strong>Contesto:</strong> Le RDA arrivano senza commessa o centro di costo obbligatorio.<br><strong>Problema:</strong> Impossibile allocare costi correttamente; contabilità deve intervenire a posteriori."},
+      {id:"G2",title:"Shadow Spend (No RDA)",ctx:"<strong>Contesto:</strong> Acquisti effettuati fuori da eSolver senza tracciabilità.<br><strong>Problema:</strong> Spese non autorizzate e non visibili nel budget."},
+      {id:"G3",title:"Autorizzazioni >5k fuori sistema",ctx:"<strong>Contesto:</strong> Approvazioni di grandi importi gestite via mail/voce invece che su workflow.<br><strong>Problema:</strong> Nessuna audit trail, rischio approvazioni mancate o contestate."},
+      {id:"G4",title:"Condizioni pagamento ODA errate",ctx:"<strong>Contesto:</strong> Scadenze su ordini non allineate all'anagrafica fornitore.<br><strong>Problema:</strong> Rischio pagamenti tardivi o anticipati, perdita di sconti."},
+      {id:"G5",title:"Invisibilità ordini in ritardo",ctx:"<strong>Contesto:</strong> Difficoltà a monitorare quali ordini sono scaduti e non consegnati.<br><strong>Problema:</strong> Nessun alert automatico; si scopre il ritardo solo quando serve la merce."},
+      {id:"G6",title:"Disallineamento RDA/Jira",ctx:"<strong>Contesto:</strong> Mancanza di link tra la richiesta d'acquisto e il ticket tecnico Jira.<br><strong>Problema:</strong> Impossibile capire a quale progetto si riferisce l'acquisto."},
+      {id:"G7",title:"ROP non tarato",ctx:"<strong>Contesto:</strong> Parametri di riordino automatico non aggiornati ai volumi attuali.<br><strong>Problema:</strong> Ordini di emergenza frequenti o sovra-scorte costose."},
+      {id:"G8",title:"Mancanza di Forecast",ctx:"<strong>Contesto:</strong> Acquisti basati sull'urgenza invece che su previsioni di vendita.<br><strong>Problema:</strong> Costi più alti, rotture di stock, nessuna pianificazione."},
+      {id:"G9",title:"PNC Revolut non registrata",ctx:"<strong>Contesto:</strong> Dopo l'acquisto Revolut, la PNC non viene registrata subito. L'ODA rimane 'da pagare'.<br><strong>Problema:</strong> Rischio doppio pagamento se non riconosciuto a memoria."},
+      {id:"G10",title:"No integrazione Revolut/eSolver",ctx:"<strong>Contesto:</strong> Caricamento manuale dei movimenti Revolut invece che via API.<br><strong>Problema:</strong> Ore di lavoro manuale settimanale, errori di inserimento."},
+      {id:"G11",title:"IVA errata ODA Revolut",ctx:"<strong>Contesto:</strong> Errori nell'applicazione dei codici IVA su acquisti diretti esteri.<br><strong>Problema:</strong> Dichiarativi IVA errati, rischio sanzioni."},
+      {id:"G17",title:"Controllo Qualità ritardato",ctx:"<strong>Contesto:</strong> Merce che resta in attesa di controllo bloccando il flusso passivo.<br><strong>Problema:</strong> Ritardi nella disponibilità del materiale."},
+      {id:"G50",title:"ODA provvisorio pagabile",ctx:"<strong>Contesto:</strong> Possibilità tecnica di pagare ordini non ancora confermati.<br><strong>Problema:</strong> Pagamenti a fronte di ordini non validati, rischio finanziario."},
+      {id:"G51",title:"RDA senza info pagamento",ctx:"<strong>Contesto:</strong> Le RDA non specificano se il fornitore è già stato pagato (es. carta credito).<br><strong>Problema:</strong> Doppi pagamenti non rilevati tempestivamente."},
+      {id:"G52",title:"Procedura PRD non aggiornata",ctx:"<strong>Contesto:</strong> Regole di acquisto non allineate ai volumi attuali.<br><strong>Problema:</strong> Soglie obsolete generano approvazioni inappropriate."},
+      {id:"G53",title:"DDT non conformi (Consolidamento)",ctx:"<strong>Contesto:</strong> Problemi nella registrazione dei documenti di trasporto in entrata.<br><strong>Problema:</strong> Disallineamento tra merce ricevuta e registrazioni contabili."},
+      {id:"G54",title:"Amazon multi-addebito (PNC)",ctx:"<strong>Contesto:</strong> Micro-addebiti Amazon che frammentano le registrazioni contabili.<br><strong>Problema:</strong> Ore di riconciliazione manuale per abbinare addebiti multipli."}
+    ]
+  },
+  {
+    id:"C2",name:"Ciclo attivo & sales",icon:"📋",color:"#059669",bg:"#ecfdf5",
+    desc:"Ordini clienti, anagrafiche, magazzino verde",
+    gaps:[
+      {id:"G18",title:"Anagrafica Sales errata",ctx:"<strong>Contesto:</strong> Dati fiscali clienti incompleti nel portale che generano errori in fattura.<br><strong>Problema:</strong> Fatture da correggere, note di credito, ritardi di emissione."},
+      {id:"G19",title:"No validazione P.IVA real-time",ctx:"<strong>Contesto:</strong> Mancanza di controllo VIES/AdE al momento dell'ordine.<br><strong>Problema:</strong> Fatture B2B emesse a soggetti non validi; problemi IVA."},
+      {id:"G20",title:"ODV abbandonati non cancellati",ctx:"<strong>Contesto:</strong> Ordini vecchi mai pagati che sporcano il database e le statistiche.<br><strong>Problema:</strong> Dati di vendita distorti, analisi inattendibili."},
+      {id:"G21",title:"No notifica Magazzino (Verde)",ctx:"<strong>Contesto:</strong> Il magazzino non vede subito quando un ordine è pagato e pronto.<br><strong>Problema:</strong> Ritardi nelle spedizioni anche se il pagamento è già acquisito."},
+      {id:"G22",title:"Tipo documento DDT errato",ctx:"<strong>Contesto:</strong> Errori manuali nella selezione della tipologia di documento di trasporto.<br><strong>Problema:</strong> DDT non conformi, blocchi doganali, correzioni manuali."},
+      {id:"G23",title:"Acconti HACK/STACK manuali",ctx:"<strong>Contesto:</strong> Gestione non standardizzata degli acconti per prodotti HACK/STACK.<br><strong>Problema:</strong> Errori di contabilizzazione, tempi lunghi di gestione."},
+      {id:"G24",title:"Solleciti ODV senza alert",ctx:"<strong>Contesto:</strong> Nessun sistema che segnali quali ordini sollecitare ai clienti.<br><strong>Problema:</strong> Ordini non pagati dimenticati, perdita di fatturato."},
+      {id:"G25",title:"P.IVA VIES non riverificata",ctx:"<strong>Contesto:</strong> Nessun controllo periodico sulla validità delle P.IVA estere nel tempo.<br><strong>Problema:</strong> Esenzioni IVA su partite scadute, esposizione a sanzioni."},
+      {id:"G26",title:"Assenza di CRM",ctx:"<strong>Contesto:</strong> Impossibile vedere lo storico comunicazioni/problemi legati a un cliente Sales.<br><strong>Problema:</strong> Ogni interazione riparte da zero, nessuna visibilità su upsell o problemi aperti."},
+      {id:"G27",title:"Verifica manuale OSS",ctx:"<strong>Contesto:</strong> Controllo manuale delle soglie di vendita per l'IVA europea (OSS).<br><strong>Problema:</strong> Rischio di superare soglie senza adeguarsi, con sanzioni fiscali."}
+    ]
+  },
+  {
+    id:"C3",name:"E-commerce & HelpDesk",icon:"🛍️",color:"#d97706",bg:"#fffbeb",
+    desc:"Shop Magento, HelpDesk, IXI, pagamenti online",
+    gaps:[
+      {id:"G29",title:"P.IVA errata su Shop",ctx:"<strong>Contesto:</strong> Clienti che inseriscono dati fiscali non validi su Magento.<br><strong>Problema:</strong> Fatture errate, solleciti di correzione, perdita di tempo."},
+      {id:"G30",title:"No alert import NAS falliti",ctx:"<strong>Contesto:</strong> Mancata notifica se l'import degli ordini dallo shop a eSolver si blocca.<br><strong>Problema:</strong> Ordini persi silenziosamente, scoperto solo a fine giornata."},
+      {id:"G31",title:"ID eSolver non propagato a HD",ctx:"<strong>Contesto:</strong> L'ID fattura non torna su HelpDesk, rendendo difficile l'assistenza.<br><strong>Problema:</strong> Il supporto non sa a quale fattura si riferisce un ticket."},
+      {id:"G32",title:"HD sovrascrive Magento",ctx:"<strong>Contesto:</strong> HelpDesk modifica anagrafiche corrette provenienti dallo shop.<br><strong>Problema:</strong> Dati cliente corrotti, errori in fattura."},
+      {id:"G33",title:"Centesimo IVA HD/eSolver",ctx:"<strong>Contesto:</strong> Differenze di arrotondamento che bloccano la quadratura delle fatture.<br><strong>Problema:</strong> Riconciliazioni manuali quotidiane per 1-2 centesimi."},
+      {id:"G34",title:"VIES instabile (B2B → B2C)",ctx:"<strong>Contesto:</strong> Se il VIES è lento, i clienti B2B comprano erroneamente come privati.<br><strong>Problema:</strong> IVA applicata al posto di esenzione, riemissione fatture."},
+      {id:"G35",title:"SEPA: ordini sospesi 8gg",ctx:"<strong>Contesto:</strong> Ordini con bonifico SEPA che restano in stato sospeso fino a 8 giorni.<br><strong>Problema:</strong> Blocco spedizione, cliente insoddisfatto."},
+      {id:"G36",title:"Bonifici senza rif. ordine",ctx:"<strong>Contesto:</strong> Clienti shop che pagano senza indicare il numero d'ordine in causale.<br><strong>Problema:</strong> Abbinamento manuale dei bonifici agli ordini."},
+      {id:"G37",title:"PayPal su Excel Comparator",ctx:"<strong>Contesto:</strong> Riconciliazione PayPal gestita fuori sistema con file Excel.<br><strong>Problema:</strong> Processo non scalabile, errori umani frequenti."},
+      {id:"G38",title:"Highlight senza riconciliazione",ctx:"<strong>Contesto:</strong> Gestione manuale delle rate e dei pagamenti della piattaforma Highlight.<br><strong>Problema:</strong> Nessun collegamento automatico tra rate e fatture."},
+      {id:"G39",title:"Export fatture HD manuale",ctx:"<strong>Contesto:</strong> Necessità di esportare manualmente i dati da HD a eSolver ogni giorno.<br><strong>Problema:</strong> Task ripetitivo quotidiano, rischio dimenticanza."},
+      {id:"G40",title:"Flag 'pay_vat' errato HD",ctx:"<strong>Contesto:</strong> Errori nell'applicazione dell'IVA sui servizi venduti tramite HelpDesk.<br><strong>Problema:</strong> Fatture con IVA errata, correzioni post-emissione."},
+      {id:"G41",title:"No sync Shop/HD (Servizi)",ctx:"<strong>Contesto:</strong> I servizi comprati sullo shop non si attivano automaticamente su HelpDesk.<br><strong>Problema:</strong> Attivazione manuale per ogni ordine, possibili ritardi."},
+      {id:"G42",title:"Rebuild HD senza timeline",ctx:"<strong>Contesto:</strong> Incertezza sui tempi di rilascio del nuovo sistema HelpDesk.<br><strong>Problema:</strong> Impossibile pianificare migrazioni o formare il team."},
+      {id:"G43",title:"IXI zero integrazione",ctx:"<strong>Contesto:</strong> I dati di vendita IXI non sono collegati a eSolver.<br><strong>Problema:</strong> Nessuna visibilità sul fatturato IXI nel gestionale."},
+      {id:"G44",title:"Riconoscimento IXI manuale",ctx:"<strong>Contesto:</strong> Difficoltà ad abbinare i pagamenti Stripe/IXI ai relativi clienti.<br><strong>Problema:</strong> Riconciliazioni manuali, rischio pagamenti non abbinati."}
+    ]
+  },
+  {
+    id:"C4",name:"Tesoreria, dogane & fiscale",icon:"🏦",color:"#dc2626",bg:"#fef2f2",
+    desc:"Banche, riconciliazioni, dogane, adempimenti",
+    gaps:[
+      {id:"G12",title:"Fatture UE irrecuperabili",ctx:"<strong>Contesto:</strong> Tempo perso a sollecitare fatture da fornitori SaaS esteri.<br><strong>Problema:</strong> IVA indetraibile per mancanza documenti, costi nascosti."},
+      {id:"G13",title:"Anagrafiche estere incomplete",ctx:"<strong>Contesto:</strong> Mancanza di dati per l'invio corretto dell'Esterometro.<br><strong>Problema:</strong> Adempimento fiscale a rischio, sanzioni."},
+      {id:"G14",title:"Recupero MRN manuale",ctx:"<strong>Contesto:</strong> Inserimento manuale dei codici MRN doganali in eSolver.<br><strong>Problema:</strong> Ore di lavoro manuale, errori di inserimento."},
+      {id:"G15",title:"Discrepanza valori Cina",ctx:"<strong>Contesto:</strong> Gestione delle differenze tra valori doganali e fatture fornitori cinesi.<br><strong>Problema:</strong> Dazi calcolati su valori errati, rischio contestazione doganale."},
+      {id:"G16",title:"Credenziali SaaS SPOF",ctx:"<strong>Contesto:</strong> Password di servizi critici in mano a singole persone (Single Point of Failure).<br><strong>Problema:</strong> Blocco operativo se la persona è assente."},
+      {id:"G28",title:"Incassi manuali (Gate)",ctx:"<strong>Contesto:</strong> Gli ordini non diventano verdi finché non viene registrato manualmente il bonifico.<br><strong>Problema:</strong> Merce ferma in magazzino anche se i soldi sono già in banca."},
+      {id:"G45",title:"Giroconto Stripe cumulativo",ctx:"<strong>Contesto:</strong> Bonifici Stripe che accorpano più transazioni in un unico giroconto.<br><strong>Problema:</strong> Riconciliazione molto lenta, impossibile abbinare 1:1."},
+      {id:"G46",title:"Backup incassi non formalizzato",ctx:"<strong>Contesto:</strong> Rischio blocco attività se la persona dedicata agli incassi è assente.<br><strong>Problema:</strong> Nessuno in grado di sostituire, ordini bloccati."},
+      {id:"G47",title:"ADM export: ricerca giorno singolo",ctx:"<strong>Contesto:</strong> Il portale doganale non permette ricerche per range di date.<br><strong>Problema:</strong> Ricerca bolla per bolla, giorno per giorno."},
+      {id:"G48",title:"Visto uscire pendente (No coda)",ctx:"<strong>Contesto:</strong> Nessun sistema che segnali quali export non hanno ancora la prova di uscita.<br><strong>Problema:</strong> IVA 0% a rischio senza prova di esportazione."},
+      {id:"G49",title:"Bollette EX da shipping informali",ctx:"<strong>Contesto:</strong> Ricezione disordinata dei documenti doganali dai corrieri.<br><strong>Problema:</strong> Documenti smarriti, archivio incompleto per controlli."}
+    ]
+  }
+];
+
+let userName = "";
+let selectedClusters = [];
+let queue = [];
+let qIdx = 0;
+let answers = {};
+let lastClusterId = null;
+
+function buildClusters() {
+  const grid = document.getElementById("cluster-grid");
+  CLUSTERS.forEach(function(c) {
+    const div = document.createElement("div");
+    div.className = "cluster-card on";
+    div.dataset.id = c.id;
+    div.innerHTML = '<div><span class="cc-dot" style="background:' + c.color + '"></span><span class="cc-name">' + c.icon + ' ' + c.name + '</span></div><div class="cc-desc">' + c.desc + '</div><div class="cc-count">' + c.gaps.length + ' gap</div>';
+    div.onclick = function() {
+      const on = div.classList.toggle("on");
+      if (on) {
+        if (!selectedClusters.includes(c.id)) selectedClusters.push(c.id);
+      } else {
+        selectedClusters = selectedClusters.filter(function(x) { return x !== c.id; });
+      }
+    };
+    grid.appendChild(div);
+    selectedClusters.push(c.id);
+  });
+}
+
+function startSurvey() {
+  userName = document.getElementById("inp-name").value.trim();
+  if (!userName) { showToast("Inserisci il tuo nome per continuare.", true); return; }
+  if (!selectedClusters.length) { showToast("Seleziona almeno un cluster.", true); return; }
+  queue = [];
+  CLUSTERS.forEach(function(c) {
+    if (selectedClusters.includes(c.id)) {
+      c.gaps.forEach(function(g) {
+        queue.push(Object.assign({}, g, { clusterId: c.id, clusterName: c.name, clusterColor: c.color, clusterBg: c.bg, clusterIcon: c.icon }));
+      });
+    }
+  });
+  qIdx = 0;
+  lastClusterId = null;
+  checkBreak();
+}
+
+function checkBreak() {
+  var q = queue[qIdx];
+  if (!q) { showSubmit(); return; }
+  if (q.clusterId !== lastClusterId) {
+    lastClusterId = q.clusterId;
+    var c = CLUSTERS.filter(function(x) { return x.id === q.clusterId; })[0];
+    document.getElementById("break-icon").textContent = c.icon;
+    document.getElementById("break-title").textContent = c.name;
+    document.getElementById("break-desc").textContent = c.desc + " — " + c.gaps.length + " domande";
+    showScreen("screen-break");
+  } else {
+    showScreen("screen-question");
+    renderQ();
+  }
+}
+
+function continueFromBreak() {
+  showScreen("screen-question");
+  renderQ();
+}
+
+function renderQ() {
+  var q = queue[qIdx];
+  var total = queue.length;
+  var pct = Math.round((qIdx / total) * 100);
+  document.getElementById("prog-fill").style.width = pct + "%";
+  document.getElementById("prog-label").textContent = "Domanda " + (qIdx + 1) + " di " + total;
+  document.getElementById("prog-pct").textContent = pct + "%";
+  var pill = document.getElementById("q-pill");
+  pill.textContent = q.clusterIcon + " " + q.clusterName;
+  pill.style.background = q.clusterBg;
+  pill.style.color = q.clusterColor;
+  pill.style.border = "1px solid " + q.clusterColor + "33";
+  document.getElementById("q-id").textContent = q.id;
+  document.getElementById("q-title").textContent = q.title;
+  document.getElementById("q-context").innerHTML = q.ctx;
+  document.getElementById("nav-counter").textContent = (qIdx + 1) + " / " + total;
+  document.getElementById("btn-prev").style.visibility = qIdx === 0 ? "hidden" : "visible";
+  var row = document.getElementById("priority-row");
+  row.innerHTML = "";
+  var saved = answers[q.id] || {};
+  [1,2,3,4,5].forEach(function(n) {
+    var btn = document.createElement("button");
+    btn.className = "p-btn" + (saved.priority === n ? " sel-" + n : "");
+    btn.innerHTML = '<span class="p-num">' + n + '</span><span class="p-lbl">' + P_LABELS[n] + '</span>';
+    btn.onclick = function() {
+      document.querySelectorAll(".p-btn").forEach(function(b) { b.className = "p-btn"; });
+      btn.className = "p-btn sel-" + n;
+      if (!answers[q.id]) answers[q.id] = {};
+      answers[q.id].priority = n;
+    };
+    row.appendChild(btn);
+  });
+  document.getElementById("t-h").value = saved.hours !== undefined ? saved.hours : "";
+  document.getElementById("t-m").value = saved.mins !== undefined ? saved.mins : "";
+  document.getElementById("q-notes").value = saved.notes || "";
+}
+
+function saveQ() {
+  var q = queue[qIdx];
+  if (!answers[q.id]) answers[q.id] = {};
+  var sel = document.querySelector(".p-btn[class*='sel-']");
+  if (sel) {
+    var m = sel.className.match(/sel-(\d)/);
+    if (m) answers[q.id].priority = parseInt(m[1]);
+  }
+  var h = parseInt(document.getElementById("t-h").value) || 0;
+  var mn = parseInt(document.getElementById("t-m").value) || 0;
+  answers[q.id].hours = h;
+  answers[q.id].mins = mn;
+  answers[q.id].totalMins = h * 60 + mn;
+  answers[q.id].notes = document.getElementById("q-notes").value.trim();
+  answers[q.id].skipped = false;
+}
+
+function nextQ() { saveQ(); qIdx++; if (qIdx >= queue.length) { showSubmit(); return; } checkBreak(); }
+function prevQ() { saveQ(); if (qIdx > 0) { qIdx--; showScreen("screen-question"); renderQ(); } }
+function skipQ() {
+  var q = queue[qIdx];
+  answers[q.id] = { skipped: true, priority: 0, hours: 0, mins: 0, totalMins: 0, notes: "" };
+  qIdx++;
+  if (qIdx >= queue.length) { showSubmit(); return; }
+  checkBreak();
+}
+function goBackToLast() { qIdx = queue.length - 1; showScreen("screen-question"); renderQ(); }
+
+function showSubmit() {
+  var answered = queue.filter(function(q) { return answers[q.id] && !answers[q.id].skipped && answers[q.id].priority > 0; });
+  var skipped = queue.filter(function(q) { return answers[q.id] && answers[q.id].skipped; });
+  var totalMins = answered.reduce(function(s, q) { return s + (answers[q.id].totalMins || 0); }, 0);
+  document.getElementById("summary-pills").innerHTML =
+    '<span class="summary-pill">👤 ' + userName + '</span>' +
+    '<span class="summary-pill">✅ ' + answered.length + ' gap valutati</span>' +
+    '<span class="summary-pill">⏭️ ' + skipped.length + ' saltati</span>' +
+    '<span class="summary-pill">⏱️ ' + Math.floor(totalMins/60) + 'h ' + (totalMins%60) + 'm stimate / sett.</span>';
+  showScreen("screen-submit");
+}
+
+async function submitAnswers() {
+  var btn = document.getElementById("btn-submit");
+  btn.textContent = "Invio in corso…";
+  btn.disabled = true;
+  document.getElementById("submit-status").textContent = "";
+  var allGaps = [];
+  CLUSTERS.forEach(function(c) {
+    c.gaps.forEach(function(g) {
+      allGaps.push(Object.assign({}, g, { clusterName: c.name }));
+    });
+  });
+  var rows = allGaps.map(function(g) {
+    var a = answers[g.id] || { skipped: true, priority: 0, hours: 0, mins: 0, totalMins: 0, notes: "" };
+    return {
+      id: g.id, title: g.title, cluster: g.clusterName,
+      priority: a.priority || 0, priorityLabel: P_LABELS[a.priority] || "",
+      hours: a.hours || 0, mins: a.mins || 0, totalMins: a.totalMins || 0,
+      notes: a.notes || "", skipped: !!a.skipped
+    };
+  });
+  var payload = { name: userName, timestamp: new Date().toISOString(), rows: rows };
+  try {
+    var resp = await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    showScreen("screen-done");
+    document.getElementById("done-msg").textContent = "Grazie " + userName + "! Le tue risposte sono state salvate nel foglio condiviso.";
+  } catch(err) {
+    btn.textContent = "Invia risposte →";
+    btn.disabled = false;
+    document.getElementById("submit-status").textContent = "⚠️ Errore: " + err.message + ". Verifica che il workflow N8n sia attivo.";
+    showToast("Errore nell'invio. Riprova.", true);
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(function(s) { s.classList.remove("active"); });
+  document.getElementById(id).classList.add("active");
+  window.scrollTo(0, 0);
+}
+
+function showToast(msg, err) {
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (err ? " err" : "");
+  setTimeout(function() { t.className = "toast"; }, 3500);
+}
+
+buildClusters();
+</script>
+</body>
+</html>
